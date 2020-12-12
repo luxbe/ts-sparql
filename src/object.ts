@@ -15,12 +15,12 @@ export const instanceOfRDFObject = (object: any): object is IRDFObject => {
 };
 
 export function RDFObject(prefixes?: IRDFObject['__prefixes__']) {
-    return function <T extends { new (...args: any[]): {} }>(constructor: T) {
-        const get = function (): IRDFObject['__prefixes__'] {
+    return <T extends { new (...args: any[]): {} }>(constructor: T) => {
+        const get = (): IRDFObject['__prefixes__'] => {
             return prefixes || {};
         };
 
-        const set = function (_prefixes: IRDFObject['__prefixes__']) {
+        const set = (_prefixes: IRDFObject['__prefixes__']) => {
             prefixes = _prefixes;
         };
 
