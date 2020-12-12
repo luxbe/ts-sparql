@@ -1,3 +1,3 @@
 # TS SPARQL
 
-TS SPARQL is a ORM to SPARQL Mapper
+TS SPARQL is an object to SPARQL mapper
