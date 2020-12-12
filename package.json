@@ -1,0 +1,20 @@
+{
+  "name": "ts-sparql",
+  "version": "0.0.1",
+  "description": "A Typescript SPARQL mapper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "SPARQL"
+  ],
+  "author": "luxbe",
+  "license": "ISC",
+  "dependencies": {
+    "superagent": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/superagent": "^4.1.10"
+  }
+}
