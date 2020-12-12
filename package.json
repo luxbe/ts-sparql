@@ -11,10 +11,7 @@
   ],
   "author": "luxbe",
   "license": "ISC",
-  "dependencies": {
-    "superagent": "^6.1.0"
-  },
   "devDependencies": {
-    "@types/superagent": "^4.1.10"
+    "typescript": "^4.1.3"
   }
 }
