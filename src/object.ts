@@ -15,7 +15,7 @@ export const instanceOfRDFObject = (object: any): object is IRDFObject => {
 };
 
 export function RDFObject(prefixes?: IRDFObject['__prefixes__']) {
-    return <T extends { new (...args: any[]): {} }>(constructor: T) => {
+    return <T extends new (...args: any[]) => {}>(constructor: T) => {
         const get = (): IRDFObject['__prefixes__'] => {
             return prefixes || {};
         };
