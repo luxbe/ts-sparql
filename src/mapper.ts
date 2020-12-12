@@ -15,7 +15,7 @@ export class RDFMapper {
         );
     }
 
-    static serialize(o: Object | Array<Object>): typeof RDFMapper {
+    static serialize(o: object | object[]): typeof RDFMapper {
         if (Array.isArray(o)) {
             this.inserts = o.map((_o) => this._serialize(_o));
         } else {
@@ -25,7 +25,7 @@ export class RDFMapper {
         return RDFMapper;
     }
 
-    private static _serialize(o: Object): string {
+    private static _serialize(o: object): string {
         if (typeof o === undefined) return '';
 
         const _o = o as IRDFObject;
@@ -60,7 +60,7 @@ export class RDFMapper {
 
         if (prefixes)
             Object.entries(prefixes).forEach(([key, value]) =>
-                RDFMapper.prefixes.set(key, value)
+                RDFMapper.prefixes.set(key, value),
             );
 
         return `INSERT DATA {
