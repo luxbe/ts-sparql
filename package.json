@@ -16,7 +16,7 @@
     "postversion": "git push && git push --tags"
   },
   "keywords": [
-    "SPARQL"
+    "sparql", "TypeScript", "decorators"
   ],
   "files": [
     "out/**/*"
