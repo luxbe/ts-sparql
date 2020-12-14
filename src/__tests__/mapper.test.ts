@@ -1,5 +1,5 @@
 import { User } from './user';
-import { RDFMapper } from '../mapper';
+import { RDFMapper } from '../';
 
 test('RDFMapper', () => {
     const user = new User('1234', 'Hello there');

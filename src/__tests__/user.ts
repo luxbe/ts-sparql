@@ -1,9 +1,9 @@
-import { RDFId } from '../id';
-import { RDFObject } from '../object';
+import { Id } from '../id';
+import { Entity } from '../entity';
 
-@RDFObject()
+@Entity()
 export class User {
-    @RDFId('user')
+    @Id('user')
     id: string;
 
     name: string;
