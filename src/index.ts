@@ -1,5 +1,5 @@
-import { RDFId } from './id';
+import { Id } from './id';
 import { RDFMapper } from './mapper';
-import { RDFObject } from './object';
+import { Entity } from './entity';
 
-export { RDFId, RDFMapper, RDFObject };
+export { Id, RDFMapper, Entity };

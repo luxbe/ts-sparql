@@ -1,8 +1,8 @@
-import { IRDFObject } from './object';
+import { IEntity } from './entity';
 
-export function RDFId(prefix: string = '') {
+export function Id(prefix: string = '') {
     return (target: object, key: string) => {
-        const get = (): IRDFObject['__rdfid__'] => {
+        const get = (): IEntity['__rdfid__'] => {
             return {
                 prefix,
                 key,

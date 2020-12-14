@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { instanceOfRDFObject, IRDFObject } from './object';
+import { instanceOfEntity, IEntity } from './entity';
 
 export class RDFMapper {
     static inserts: string[] = [];
@@ -28,7 +28,7 @@ export class RDFMapper {
     private static _serialize(o: object): string {
         if (typeof o === undefined) return '';
 
-        const _o = o as IRDFObject;
+        const _o = o as IEntity;
         const idKey = _o.__rdfid__.key;
         const idPrefix = _o.__rdfid__.prefix;
 
@@ -40,7 +40,7 @@ export class RDFMapper {
             if (Array.isArray(object)) {
                 return object.map((v) => parse(key, v)).join('; \n');
             }
-            if (instanceOfRDFObject(object)) {
+            if (instanceOfEntity(object)) {
                 prefixes = {
                     ...prefixes,
                     ...object.__prefixes__,

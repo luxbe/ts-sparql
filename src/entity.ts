@@ -1,4 +1,4 @@
-export interface IRDFObject {
+export interface IEntity {
     __rdfid__: {
         prefix: string;
         key: string;
@@ -6,7 +6,7 @@ export interface IRDFObject {
     __prefixes__: { [key: string]: string };
 }
 
-export const instanceOfRDFObject = (object: any): object is IRDFObject => {
+export const instanceOfEntity = (object: any): object is IEntity => {
     return (
         object !== undefined &&
         object.__rdfid__ !== undefined &&
@@ -14,13 +14,13 @@ export const instanceOfRDFObject = (object: any): object is IRDFObject => {
     );
 };
 
-export function RDFObject(prefixes?: IRDFObject['__prefixes__']) {
+export function Entity(prefixes?: IEntity['__prefixes__']) {
     return <T extends new (...args: any[]) => {}>(constructor: T) => {
-        const get = (): IRDFObject['__prefixes__'] => {
+        const get = (): IEntity['__prefixes__'] => {
             return prefixes || {};
         };
 
-        const set = (_prefixes: IRDFObject['__prefixes__']) => {
+        const set = (_prefixes: IEntity['__prefixes__']) => {
             prefixes = _prefixes;
         };
 
