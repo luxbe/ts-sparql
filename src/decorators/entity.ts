@@ -1,3 +1,5 @@
+import { Storage } from '../storage/storage';
+
 export interface IEntity {
     __rdfid__: {
         prefix: string;
@@ -14,7 +16,12 @@ export const instanceOfEntity = (object: any): object is IEntity => {
     );
 };
 
-export function Entity(prefixes?: IEntity['__prefixes__']) {
+export function Entity(name: string, prefixes?: IEntity['__prefixes__']) {
+    if (Storage.global.names.includes(name))
+        throw new Error(`${name} is already defined`);
+
+    Storage.global.names.push(name);
+
     return <T extends new (...args: any[]) => {}>(constructor: T) => {
         const get = (): IEntity['__prefixes__'] => {
             return prefixes || {};
