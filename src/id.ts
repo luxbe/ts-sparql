@@ -1,4 +1,4 @@
-import { IEntity } from './entity';
+import { IEntity } from './decorators/entity';
 
 export function Id(prefix: string = '') {
     return (target: object, key: string) => {
