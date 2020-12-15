@@ -1,15 +1,17 @@
-import { Id } from '../id';
-import { Entity } from '../entity';
+import { Id, Entity } from '../';
 
-@Entity()
+@Entity('user')
 export class User {
-    @Id('user')
+    @Id()
     id: string;
 
-    name: string;
+    // @Property()
+    // name: string;
 
     constructor(id: string, name: string) {
         this.id = id;
-        this.name = name;
+        // this.name = name;
     }
 }
+
+// TsSparql.init({ url: 'xyz' });
