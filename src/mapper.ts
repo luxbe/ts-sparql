@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { instanceOfEntity, IEntity } from './entity';
+import { instanceOfEntity, IEntity } from './decorators/entity';
 
 export class RDFMapper {
     static inserts: string[] = [];
