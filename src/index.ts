@@ -1,5 +1,7 @@
-import { Id } from './id';
-import { RDFMapper } from './mapper';
 import { Entity } from './decorators/entity';
+import { Id } from './decorators/id';
+import { Property } from './decorators/property';
+import { RDFMapper } from './mapper';
+import { TsSparql } from './tssparql/tssparql';
 
-export { Id, RDFMapper, Entity };
+export { Id, Property, RDFMapper, Entity, TsSparql };
