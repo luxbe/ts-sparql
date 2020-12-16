@@ -7,5 +7,10 @@ it('should not accept 2 entities with the same name', () => {
     expect(() => {
         @Entity('user')
         class abc {}
-    }).toThrowError('user is already defined');
+    }).toThrowError("'user' is already defined");
+
+    expect(() => {
+        @Entity()
+        class User {}
+    }).toThrowError("'user' is already defined");
 });
