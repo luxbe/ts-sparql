@@ -2,7 +2,7 @@ export interface IPrefixes {
     [key: string]: string;
 }
 
-interface IStorage {
+export interface IStorage {
     names: string[];
     prefixes: {
         [key: string]: IPrefixes;
@@ -11,7 +11,11 @@ interface IStorage {
         [key: string]: string;
     };
     properties: {
-        [key: string]: string[];
+        [key: string]: {
+            key: string;
+            prefix?: string;
+            literal: boolean;
+        }[];
     };
 }
 
