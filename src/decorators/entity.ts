@@ -6,7 +6,15 @@ export function Entity(name?: string, prefixes?: IPrefixes) {
         prefixes ||= {};
 
         if (Storage.global.names.includes(name))
-            throw new Error(`${name} is already defined`);
+            throw new Error(`'${name}' is already defined`);
+
+        const definedKeys = Object.keys(prefixes);
+        Storage.global.properties[name].forEach((prop) => {
+            if (prop.prefix && !definedKeys.includes(prop.prefix))
+                throw new Error(
+                    `key '${prop.prefix}' is not defined in '${constructor.name}'`,
+                );
+        });
 
         Storage.global.names.push(name);
         Storage.global.prefixes[name] = prefixes;
