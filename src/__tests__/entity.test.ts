@@ -1,14 +1,9 @@
-import { User } from './user';
-import { Storage } from '../storage/storage';
 import { Entity } from '..';
-
-test('should include user in storage', () => {
-    new User('1234', 'Hello there');
-
-    expect(Storage.global.names.includes('user')).toBeTruthy();
-});
+import { User } from './user';
 
 it('should not accept 2 entities with the same name', () => {
+    new User('1234', 'Hello there');
+
     expect(() => {
         @Entity('user')
         class abc {}
