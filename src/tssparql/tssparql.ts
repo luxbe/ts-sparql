@@ -59,20 +59,20 @@ export class TsSparql {
             throw new Error('Entity was not defined');
 
         // get id
-        const id_key = this.storage.ids[name];
-        if (!id_key) throw new Error('Entity does not have an Id');
-        const id = entity[id_key];
+        const idKey = this.storage.ids[name];
+        if (!idKey) throw new Error('Entity does not have an Id');
+        const id = entity[idKey];
 
         // get prefixes
         const _prefixes = this.storage.prefixes[name];
 
         // get properties
-        const property_keys = this.storage.properties[name];
-        if (!property_keys.length)
+        const propertyKeys = this.storage.properties[name];
+        if (!propertyKeys.length)
             throw new Error('Entity does not have any properties');
 
         const properties: Relation[] = [];
-        property_keys.forEach((p) =>
+        propertyKeys.forEach((p) =>
             properties.push({
                 predicate: (p.prefix || this.defaultVoc) + ':' + p.key,
                 object: entity[p.key],
