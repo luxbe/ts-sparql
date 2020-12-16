@@ -11,7 +11,7 @@ it('should include user prefix in storage', () => {
     expect(Storage.global.prefixes['user']).toBeTruthy();
 
     expect(Storage.global.prefixes['user']['user']).toEqual(
-        'http://drei-punkte-fuer-alle/user#',
+        'http://example.com/user#',
     );
 });
 
@@ -20,6 +20,8 @@ it('should include id in storage', () => {
 });
 
 it('should include name in storage', () => {
-    expect(Storage.global.properties['user']).toContain('name');
+    expect(Storage.global.properties['user'].map((p) => p.key)).toContain(
+        'name',
+    );
     expect(Storage.global.properties['user']).toHaveLength(1);
 });
