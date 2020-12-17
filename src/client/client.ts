@@ -1,5 +1,19 @@
 import http from 'http';
 
+interface SQueryResult {
+    head: {
+        vars: string[];
+    };
+    results: {
+        bindings: {
+            [key: string]: {
+                type: 'literal';
+                value: string;
+            };
+        }[];
+    };
+}
+
 export class Client {
     baseUrl: string;
 
@@ -21,6 +35,7 @@ export class Client {
                 });
 
                 res.on('end', () => {
+                    if (data.length > 0) data = JSON.parse(data);
                     if (res.statusCode === 200 || res.statusCode === 204) {
                         resolve(data);
                     } else {
@@ -38,8 +53,12 @@ export class Client {
         });
     }
 
-    get(query: string) {
-        const data = `query=${query}`;
+    get(
+        query: string,
+        limit: number = 10,
+        offset: number = 0,
+    ): Promise<SQueryResult> {
+        const data = `query=${query}&limit=${limit}&offset=${offset}`;
 
         const options = {
             method: 'POST',
