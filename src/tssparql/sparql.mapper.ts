@@ -1,7 +1,7 @@
 import { isPrefix, isValidRegex } from '../helper';
 import { IPrefixes } from '../storage/storage';
 
-type Operations = 'INSERT';
+type Operations = 'INSERT' | 'SELECT';
 
 export interface Relation {
     predicate: string;
@@ -17,6 +17,7 @@ export class SparqlMapper {
         if (!isValidRegex(subject))
             throw new Error(`Subject '${subject}' does not match RegExp`);
         this._subject = subject;
+        this._attributes = [];
         return this;
     }
 
@@ -70,9 +71,15 @@ export class SparqlMapper {
                   .join(' ') + ' '
             : '';
 
-        return `${prefixStr}${operation === 'INSERT' ? 'INSERT DATA' : ''} { ${
-            graph ? `GRAPH ${graph} {` : ''
-        } ${this._subject} ${this._attributes
+        return `${prefixStr}${
+            operation === 'INSERT'
+                ? 'INSERT DATA'
+                : operation === 'SELECT'
+                ? 'SELECT * WHERE'
+                : ''
+        } { ${graph ? `GRAPH ${graph} {` : ''} ${
+            this._subject
+        } ${this._attributes
             .map(
                 (a) =>
                     `${a.predicate} ${a.literal ? `"${a.object}"` : a.object}`,
