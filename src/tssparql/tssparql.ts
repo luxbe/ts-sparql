@@ -56,7 +56,7 @@ export class TsSparql {
         return this;
     }
 
-    save<T extends { [key: string]: any }>(entity: T) {
+    save<T extends { [key: string]: any }>(entity: T): Promise<T> {
         // get name
         const name = entity.constructor.name.toLowerCase();
         if (!this.storage.names.includes(name))
@@ -75,7 +75,14 @@ export class TsSparql {
         if (!propertyKeys.length)
             throw new Error('Entity does not have any properties');
 
-        const properties: Relation[] = [];
+        const properties: Relation[] = [
+            {
+                predicate: 'a',
+                object:
+                    name + ':' + (name.charAt(0).toUpperCase() + name.slice(1)),
+                literal: false,
+            },
+        ];
         propertyKeys.forEach((p) =>
             properties.push({
                 predicate: (p.prefix || this.defaultVoc) + ':' + p.key,
@@ -85,40 +92,75 @@ export class TsSparql {
         );
 
         const sparql = this.mapper
-            .subject(name + ':' + 'id')
+            .subject(`${name}:${id}`)
             .assign(properties)
             .sparql('INSERT', this._graph, _prefixes, this._prefixes);
 
-        return this;
+        return new Promise((resolve, reject) => {
+            this._client
+                .post(sparql)
+                .then(() => resolve(entity))
+                .catch((err) => reject(err));
+        });
     }
 
-    test() {
-        // return this._client.post(
-        //     `PREFIX dpfa: <http://drei-punkte-fuer-alle/>
-        // PREFIX user: <http://drei-punkte-fuer-alle/user#>
-        // PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+    getOne<T extends object>(
+        type: new (...args: any[]) => T,
+        id: string,
+    ): Promise<T | undefined> {
+        return new Promise((resolve, reject) => {
+            const name = type.name.toLowerCase();
 
-        // INSERT DATA
-        //       {
-        //       GRAPH dpfa: {
-        //           user:1234 vcard:hasGivenName "Luca Alexander" ;
-        //                     vcard:hasFamilyName "Bembenek" ;
-        //                     vcard:hasEmail "bembenek.luca@gmail.com" .
-        //           }
-        //       }`,
-        // );
+            if (!this.storage.names.includes(name))
+                throw new Error('Entity was not defined');
+            let entity: { [key: string]: any } = {};
 
-        return this._client.get(
-            `PREFIX voc: <http://drei-punkte-fuer-alle.de/voc#> 
-            PREFIX league: <http://drei-punkte-fuer-alle.de/league#>
-            
-            SELECT ?id ?name (CONCAT('[',GROUP_CONCAT(?team;separator=","),']') as ?teams)
-            WHERE { 
-                ?id a league:League .
-                ?id voc:name ?name .
-                ?s voc:team ?team .
-            }
-            GROUP BY ?id ?name`,
-        );
+            // set id
+            const id_key = this.storage.ids[name];
+            entity[id_key] = id;
+
+            // get prefixes
+            const _prefixes = this.storage.prefixes[name];
+
+            // set properties
+            const _properties = this.storage.properties[name];
+            const properties = [
+                {
+                    predicate: 'a',
+                    object:
+                        name +
+                        ':' +
+                        (name.charAt(0).toUpperCase() + name.slice(1)),
+                    literal: false,
+                },
+                ..._properties.map(({ key, prefix }) => {
+                    return {
+                        literal: false,
+                        predicate: `${prefix}:${key}`,
+                        object: `?${key}`,
+                    };
+                }),
+            ];
+
+            const sparql = this.mapper
+                .subject(`${name}:${id}`)
+                .assign(properties)
+                .sparql('SELECT', this._graph, _prefixes, this._prefixes);
+
+            this._client
+                .get(sparql)
+                .then((res) => {
+                    if (res.results.bindings.length == 0)
+                        return resolve(undefined);
+                    const _o = res.results.bindings[0];
+
+                    _properties.forEach(({ key }) => {
+                        entity[key] = _o[key].value;
+                    });
+
+                    resolve(entity as T);
+                })
+                .catch((err) => reject(err));
+        });
     }
 }
