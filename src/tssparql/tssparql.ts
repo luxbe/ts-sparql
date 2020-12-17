@@ -1,6 +1,8 @@
+import { Client } from '../client/client';
 import { isValidRegex } from '../helper';
 import { IPrefixes, IStorage, Storage } from '../storage/storage';
 import { Relation, SparqlMapper } from './sparql.mapper';
+// import sa from 'superagent';
 
 interface TsSparqlOptions {
     url?: string;
@@ -16,6 +18,7 @@ export class TsSparql {
     mapper: SparqlMapper;
     defaultVoc: string;
     private _prefixes: IPrefixes;
+    private _client: Client;
     private _graph?: string;
 
     static init(options: TsSparqlOptions) {
@@ -30,7 +33,7 @@ export class TsSparql {
         if (options.url.charAt(options.url.length - 1) !== '/')
             options.url += '/';
 
-        options.url += `repositories/${options.repository}/statements`;
+        options.url += `repositories/${options.repository}`;
         return new TsSparql(options.url, Storage.global, options.defaultVoc);
     }
 
@@ -40,6 +43,7 @@ export class TsSparql {
         this.mapper = new SparqlMapper();
         this.defaultVoc = defaultVoc;
         this._prefixes = {};
+        this._client = new Client(url);
     }
 
     prefixes(prefixes: IPrefixes) {
@@ -86,5 +90,35 @@ export class TsSparql {
             .sparql('INSERT', this._graph, _prefixes, this._prefixes);
 
         return this;
+    }
+
+    test() {
+        // return this._client.post(
+        //     `PREFIX dpfa: <http://drei-punkte-fuer-alle/>
+        // PREFIX user: <http://drei-punkte-fuer-alle/user#>
+        // PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>
+
+        // INSERT DATA
+        //       {
+        //       GRAPH dpfa: {
+        //           user:1234 vcard:hasGivenName "Luca Alexander" ;
+        //                     vcard:hasFamilyName "Bembenek" ;
+        //                     vcard:hasEmail "bembenek.luca@gmail.com" .
+        //           }
+        //       }`,
+        // );
+
+        return this._client.get(
+            `PREFIX voc: <http://drei-punkte-fuer-alle.de/voc#> 
+            PREFIX league: <http://drei-punkte-fuer-alle.de/league#>
+            
+            SELECT ?id ?name (CONCAT('[',GROUP_CONCAT(?team;separator=","),']') as ?teams)
+            WHERE { 
+                ?id a league:League .
+                ?id voc:name ?name .
+                ?s voc:team ?team .
+            }
+            GROUP BY ?id ?name`,
+        );
     }
 }
