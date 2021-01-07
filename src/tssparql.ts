@@ -106,11 +106,11 @@ export class TsSparql {
 
             if (!TsSparql.storage.names.includes(name))
                 throw new Error(`Entity '${name}' is not defined`);
-            let entity: { [key: string]: any } = {};
+            const entity: { [key: string]: any } = {};
 
             // set id
-            const id_key = TsSparql.storage.keys[name];
-            entity[id_key] = id;
+            const idKey = TsSparql.storage.keys[name];
+            entity[idKey] = id;
 
             // get namespaces
             const namespaces = {
@@ -148,7 +148,7 @@ export class TsSparql {
 
             TsSparql.connection!.get(sparql)
                 .then((res) => {
-                    if (res.results.bindings.length == 0)
+                    if (res.results.bindings.length === 0)
                         return resolve(undefined);
                     const _o = res.results.bindings[0];
 
