@@ -1,20 +1,19 @@
-export interface IPrefixes {
-    [key: string]: string;
-}
+import { Namespace } from './namespaces';
 
 export interface IStorage {
     names: string[];
-    prefixes: {
-        [key: string]: IPrefixes;
+    namespaces: {
+        [key: string]: Namespace;
+        '##global##': Namespace;
     };
-    ids: {
+    keys: {
         [key: string]: string;
     };
     properties: {
         [key: string]: {
             key: string;
-            prefix?: string;
-            literal: boolean;
+            namespace: string;
+            predicate: string;
         }[];
     };
 }
@@ -22,8 +21,10 @@ export interface IStorage {
 export class Storage {
     private static _global: IStorage = {
         names: [],
-        prefixes: {},
-        ids: {},
+        namespaces: {
+            '##global##': {},
+        },
+        keys: {},
         properties: {},
     };
 
