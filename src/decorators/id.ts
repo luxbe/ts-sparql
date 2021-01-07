@@ -1,8 +1,8 @@
-import { Storage } from '../storage/storage';
+import { Storage } from '../storage';
 
-export function Id() {
+export function Id(name?: string) {
     return (target: object, key: string) => {
-        const name = target.constructor.name.toLowerCase();
-        Storage.global.ids[name] = key;
+        name ||= target.constructor.name.toLowerCase();
+        Storage.global.keys[name] = key;
     };
 }

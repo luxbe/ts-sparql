@@ -1,22 +1,43 @@
-import { Storage, IPrefixes } from '../storage/storage';
+import { Storage, Namespace } from '../storage';
 
-export function Entity(name?: string, prefixes?: IPrefixes) {
+interface Options {
+    iri?: string;
+    namespaces?: Namespace;
+}
+
+export function Entity(options: Options = {}) {
     return <T extends new (...args: any[]) => {}>(constructor: T) => {
-        name ||= constructor.name.toLowerCase();
-        prefixes ||= {};
+        const iri = options.iri || constructor.name.toLowerCase();
+        const namespaces = options.namespaces || {};
 
-        if (Storage.global.names.includes(name))
-            throw new Error(`'${name}' is already defined`);
+        const iriReg = /^[a-zA-Z0-9]*$/;
 
-        const definedKeys = Object.keys(prefixes);
-        Storage.global.properties[name].forEach((prop) => {
-            if (prop.prefix && !definedKeys.includes(prop.prefix))
+        if (!iriReg.test(iri))
+            throw new Error(`'${iri}' does not match RegExp '${iriReg}'`);
+
+        if (Storage.global.names.includes(iri))
+            throw new Error(`'${iri}' is already defined`);
+
+        if (!!!Storage.global.keys[iri])
+            throw new Error(`'${iri}' has no Id property`);
+
+        const localNamespaces = Object.keys(namespaces);
+        const globalNamespaces = Object.keys(
+            Storage.global.namespaces['##global##'],
+        );
+        // check if prefix is defined either locally or globally
+        Storage.global.properties[iri].forEach((prop) => {
+            if (
+                !!prop.namespace &&
+                !localNamespaces.includes(prop.namespace) &&
+                !globalNamespaces.includes(prop.namespace)
+            )
                 throw new Error(
-                    `key '${prop.prefix}' is not defined in '${constructor.name}'`,
+                    `Prefix: '${prop.namespace}' is not defined in '${iri}'`,
                 );
         });
 
-        Storage.global.names.push(name);
-        Storage.global.prefixes[name] = prefixes;
+        Storage.global.names.push(iri);
+        Storage.global.namespaces[iri] = namespaces;
     };
 }
