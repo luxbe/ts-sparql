@@ -36,7 +36,7 @@ export class Connection {
             },
         }).then((res) => {
             const index = (res as Response).results.bindings.findIndex(
-                (b) => b['id'].value === options.repository,
+                (b) => b.id.value === options.repository,
             );
             if (index === -1)
                 throw new Error(`repository '${options.repository}' not found`);
