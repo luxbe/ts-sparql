@@ -1,14 +1,16 @@
-import { Id, Entity, Property } from '..';
+import { Entity, Property } from '..';
+import { Id } from '../decorators';
 
-@Entity('user', {
-    user: 'http://example.com/user#',
-    voc: 'http://example.com/voc#',
+@Entity({
+    namespaces: {
+        ex: 'http://example.com',
+    },
 })
 export class User {
     @Id()
     id: string;
 
-    @Property('voc')
+    @Property('ex:myName')
     name: string;
 
     constructor(id: string, name: string) {
