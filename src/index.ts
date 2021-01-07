@@ -1,6 +1,5 @@
-import { Entity } from './decorators/entity';
-import { Id } from './decorators/id';
-import { Property } from './decorators/property';
-import { TsSparql } from './tssparql/tssparql';
+import { Entity, Id, Property } from './decorators';
+import { TsSparql } from './tssparql';
 
-export { Id, Property, Entity, TsSparql };
+export default TsSparql;
+export { Entity, Id, Property };
