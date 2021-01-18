@@ -2,6 +2,7 @@ import { Entity, Property } from '..';
 import { Id } from '../decorators';
 
 @Entity({
+    name: 'user',
     namespaces: {
         ex: 'http://example.com',
     },

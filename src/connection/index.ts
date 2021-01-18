@@ -1,3 +1,3 @@
-import { Connection } from './connection';
+import { Connection, Response } from './connection';
 
-export { Connection };
+export { Connection, Response };

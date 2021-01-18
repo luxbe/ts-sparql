@@ -1,4 +1,4 @@
 import { Namespace } from './namespaces';
-import { Storage } from './storage';
+import { Storage, Property } from './storage';
 
-export { Storage, Namespace };
+export { Storage, Namespace, Property };

@@ -23,6 +23,7 @@ test('tsSparql should connect to database', async (done) => {
 
 test('tsSparql should save User', async (done) => {
     const user = new User('1111', 'hello');
+
     tsSparql
         .save(user)
         .then(done())

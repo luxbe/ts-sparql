@@ -1,19 +1,26 @@
+import TsSparql from '..';
 import { Storage } from '../storage';
+import { IEntity, isIEntity, TempStorage } from './entity';
 
 export function Property(iri: string, name?: string) {
     return (target: object, key: string) => {
-        name ||= target.constructor.name.toLowerCase();
+        if ((target as IEntity).__tssparql__ == undefined) {
+            const data: TempStorage = {
+                idKey: '',
+                name: '',
+                properties: [],
+            };
+            (target as any).__tssparql__ = data;
+        }
 
         // filter out prefix and predicate from iri
         const matches = iri.match(/(.+?):(.*)/) || [];
-        const prefix = matches[1];
+        const namespace = matches[1];
         const predicate = matches[2];
 
-        // create empty array if no array is specified
-        Storage.global.properties[name] ||= [];
-        Storage.global.properties[name].push({
+        (target as IEntity).__tssparql__.properties?.push({
             key,
-            namespace: prefix,
+            namespace,
             predicate,
         });
     };

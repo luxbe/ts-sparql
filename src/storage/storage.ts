@@ -1,31 +1,31 @@
 import { Namespace } from './namespaces';
 
+export interface Property {
+    key: string;
+    namespace: string;
+    predicate: string;
+}
+
 export interface IStorage {
     names: string[];
-    namespaces: {
-        [key: string]: Namespace;
-        '##global##': Namespace;
+    namespaces: Namespace;
+    entities: {
+        [key: string]: ObjectStorage;
     };
-    keys: {
-        [key: string]: string;
-    };
-    properties: {
-        [key: string]: {
-            key: string;
-            namespace: string;
-            predicate: string;
-        }[];
-    };
+}
+
+export interface ObjectStorage {
+    name: string;
+    idKey: string;
+    properties: Property[];
+    namespaces: Namespace;
 }
 
 export class Storage {
     private static _global: IStorage = {
         names: [],
-        namespaces: {
-            '##global##': {},
-        },
-        keys: {},
-        properties: {},
+        namespaces: {},
+        entities: {},
     };
 
     static get global() {

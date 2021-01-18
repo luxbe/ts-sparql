@@ -1,43 +1,55 @@
-import { Storage, Namespace } from '../storage';
+import { Storage, Namespace, Property } from '../storage';
 
 interface Options {
-    iri?: string;
+    name: string;
     namespaces?: Namespace;
 }
 
-export function Entity(options: Options = {}) {
+export interface TempStorage {
+    name: string;
+    idKey: string;
+    properties: Property[];
+}
+
+export interface IEntity {
+    __tssparql__: TempStorage;
+}
+
+export function isIEntity(object: any): object is IEntity {
+    const _o = object as IEntity;
+    return (
+        _o.__tssparql__ !== undefined &&
+        _o.__tssparql__.idKey !== undefined &&
+        _o.__tssparql__.name !== undefined &&
+        _o.__tssparql__.properties !== undefined
+    );
+}
+
+export function Entity(options: Options) {
     return <T extends new (...args: any[]) => {}>(constructor: T) => {
-        const iri = options.iri || constructor.name.toLowerCase();
+        const name = options.name;
         const namespaces = options.namespaces || {};
 
         const iriReg = /^[a-zA-Z0-9]*$/;
+        if (!iriReg.test(name))
+            throw new Error(`'${name}' does not match RegExp '${iriReg}'`);
 
-        if (!iriReg.test(iri))
-            throw new Error(`'${iri}' does not match RegExp '${iriReg}'`);
+        const entity = constructor.prototype as IEntity;
 
-        if (Storage.global.names.includes(iri))
-            throw new Error(`'${iri}' is already defined`);
+        if (!isIEntity(entity))
+            throw new Error(`${constructor.name} does not have an Id`);
 
-        if (!!!Storage.global.keys[iri])
-            throw new Error(`'${iri}' has no Id property`);
+        entity.__tssparql__.name = name;
 
-        const localNamespaces = Object.keys(namespaces);
-        const globalNamespaces = Object.keys(
-            Storage.global.namespaces['##global##'],
-        );
-        // check if prefix is defined either locally or globally
-        Storage.global.properties[iri].forEach((prop) => {
-            if (
-                !!prop.namespace &&
-                !localNamespaces.includes(prop.namespace) &&
-                !globalNamespaces.includes(prop.namespace)
-            )
-                throw new Error(
-                    `Prefix: '${prop.namespace}' is not defined in '${iri}'`,
-                );
-        });
+        Storage.global.names.push(name);
 
-        Storage.global.names.push(iri);
-        Storage.global.namespaces[iri] = namespaces;
+        Storage.global.entities[name] = {
+            name: name,
+            idKey: entity.__tssparql__.idKey,
+            properties: entity.__tssparql__.properties,
+            namespaces: namespaces,
+        };
+
+        return class extends constructor {};
     };
 }

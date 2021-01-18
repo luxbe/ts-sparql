@@ -26,7 +26,7 @@ export class Mapper {
         return this;
     }
 
-    graph(graph: string) {
+    graph(graph?: string) {
         this._graph = graph;
         return this;
     }

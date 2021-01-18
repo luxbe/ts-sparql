@@ -46,6 +46,5 @@ export default function request(
             options.method == 'POST'
         ) {
         }
-        console.log(url, options, body);
     });
 }

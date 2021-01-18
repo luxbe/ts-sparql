@@ -8,11 +8,13 @@ test('storage should include key', () => {
 });
 
 test("storage 'ex' prefix should equal http://example.com", () => {
-    expect(Storage.global.namespaces['user']['ex']).toBe('http://example.com');
+    expect(Storage.global.entities['user'].namespaces['ex']).toBe(
+        'http://example.com',
+    );
 });
 
 test('storage should include name property', () => {
-    expect(Storage.global.properties['user'][0]).toStrictEqual({
+    expect(Storage.global.entities['user'].properties[0]).toStrictEqual({
         key: 'name',
         namespace: 'ex',
         predicate: 'myName',
