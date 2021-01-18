@@ -51,10 +51,7 @@ export class TsSparql {
             });
     }
 
-    save<T extends object>(
-        entity: T,
-        options: SaveOptions = {},
-    ): Promise<void> {
+    save<T extends object>(entity: T, options: SaveOptions = {}): Promise<T> {
         if (!!!TsSparql.connection) throw new Error('No connection configured');
 
         return new Promise((resolve, reject) => {
@@ -107,7 +104,7 @@ export class TsSparql {
                 .namespaces(namespaces)
                 .sparql('INSERT');
             TsSparql.connection!.post(sparql)
-                .then(() => resolve())
+                .then((entity) => resolve(entity))
                 .catch((err) => reject(err));
         });
     }
