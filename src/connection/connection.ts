@@ -5,7 +5,7 @@ interface Options {
     repository: string;
 }
 
-interface Response {
+export interface Response {
     head: {
         vars: string[];
     };
