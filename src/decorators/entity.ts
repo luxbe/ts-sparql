@@ -1,55 +1,51 @@
-import { Storage, Namespace, Property } from '../storage';
+import { PrefixMetadata } from '../interfaces';
+import IdMetadata from '../interfaces/id.metadata';
+import { PropertyMetadata } from '../interfaces/property.metadata';
+import Iri from '../iri';
+import { Metadata } from '../metadata';
+import PrefixManager from '../prefixManager';
 
-interface Options {
-    name: string;
-    namespaces?: Namespace;
-}
-
-export interface TempStorage {
-    name: string;
-    idKey: string;
-    properties: Property[];
-}
-
-export interface IEntity {
-    __tssparql__: TempStorage;
-}
-
-export function isIEntity(object: any): object is IEntity {
-    const _o = object as IEntity;
-    return (
-        _o.__tssparql__ !== undefined &&
-        _o.__tssparql__.idKey !== undefined &&
-        _o.__tssparql__.name !== undefined &&
-        _o.__tssparql__.properties !== undefined
-    );
-}
-
-export function Entity(options: Options) {
+export function Entity(iri: Iri | string) {
     return <T extends new (...args: any[]) => {}>(constructor: T) => {
-        const name = options.name;
-        const namespaces = options.namespaces || {};
+        if (typeof iri === 'string') iri = Iri.init(iri);
+        const key = constructor.name;
 
-        const iriReg = /^[a-zA-Z0-9]*$/;
-        if (!iriReg.test(name))
-            throw new Error(`'${name}' does not match RegExp '${iriReg}'`);
+        const idKey = Reflect.getMetadata('tssparql:idKey', constructor) as
+            | typeof IdMetadata.VALUE
+            | undefined;
 
-        const entity = constructor.prototype as IEntity;
+        if (idKey != undefined) Metadata.global.storage.idKeys[key] = idKey;
 
-        if (!isIEntity(entity))
-            throw new Error(`${constructor.name} does not have an Id`);
+        const _prefixMetadata = Reflect.getMetadata(
+            'tssparql:prefixes',
+            constructor,
+        ) as typeof PrefixMetadata.VALUE | undefined;
 
-        entity.__tssparql__.name = name;
+        if (_prefixMetadata != undefined) {
+            const { prefixes, options } = _prefixMetadata;
+            Object.entries(prefixes).forEach(([prefix, namespace]) => {
+                PrefixManager.add(
+                    prefix,
+                    namespace,
+                    options.override,
+                    options.global ? undefined : key,
+                );
+            });
+        }
 
-        Storage.global.names.push(name);
+        const properties = Reflect.getMetadata(
+            'tssparql:properties',
+            constructor,
+        ) as typeof PropertyMetadata.VALUE | undefined;
 
-        Storage.global.entities[name] = {
-            name: name,
-            idKey: entity.__tssparql__.idKey,
-            properties: entity.__tssparql__.properties,
-            namespaces: namespaces,
-        };
+        if (properties != undefined) {
+            Metadata.global.storage.properties[key] ||= [];
+            Metadata.global.storage.properties[key].push(...properties);
+        }
 
-        return class extends constructor {};
+        Metadata.global.storage.entities.push(key);
+        Metadata.global.storage.types[key] = iri;
+
+        return constructor;
     };
 }

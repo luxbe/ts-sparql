@@ -1,62 +1,75 @@
-import { Namespace } from '../storage';
-import { Attribute } from './attribute';
+// import { Namespace } from '../interfaces';
+// import { Attribute } from '../interfaces/attribute';
+// import Parser from './parser';
 
-type Operation = 'INSERT' | 'SELECT';
+// type Operation = 'INSERT' | 'SELECT';
 
-export class Mapper {
-    private _subject?: string;
-    private _graph?: string;
-    private _attributes: Attribute[] = [];
-    private _namespaces?: Namespace;
+// export class Mapper {
+//     private _subject?: string;
+//     private _graph?: string;
+//     private _attributes: Attribute[] = [];
+//     private _namespaces?: Namespace = {
+//         xsd: 'http://www.w3.org/2001/XMLSchema#',
+//     };
 
-    subject(subject: string) {
-        this._subject = subject;
-        this._attributes = [];
-        return this;
-    }
+//     subject(subject: string) {
+//         this._subject = subject;
+//         this._attributes = [];
+//         return this;
+//     }
 
-    assign(attributes: Attribute | Attribute[]) {
-        if (!this._subject) throw new Error('No subject provided');
-        this._attributes = this._attributes.concat(attributes);
-        return this;
-    }
+//     assign(attributes: Attribute[]) {
+//         if (!this._subject) throw new Error('No subject provided');
 
-    namespaces(namespaces: Namespace) {
-        this._namespaces = { ...this._namespaces, ...namespaces };
-        return this;
-    }
+//         attributes = attributes.reduce<Attribute[]>((attributes, a) => {
+//             if (!!a.object) attributes.push(Parser.parse(a));
+//             return attributes;
+//         }, []);
 
-    graph(graph?: string) {
-        this._graph = graph;
-        return this;
-    }
+//         this._attributes = this._attributes.concat(attributes);
+//         return this;
+//     }
 
-    sparql(operation: Operation) {
-        if (!this._subject) throw new Error('No subject provided');
-        if (!this._attributes.length) throw new Error('No attributes provided');
+//     namespaces(namespaces: Namespace) {
+//         this._namespaces = { ...this._namespaces, ...namespaces };
+//         return this;
+//     }
 
-        const namespaceStr = !!this._namespaces
-            ? Object.entries(this._namespaces)
-                  .map(([key, value]) => {
-                      return `PREFIX ${key}: <${value}>`;
-                  })
-                  .join(' ') + ' '
-            : '';
+//     graph(graph?: string) {
+//         this._graph = graph;
+//         return this;
+//     }
 
-        return `${namespaceStr}${
-            operation === 'INSERT'
-                ? 'INSERT DATA'
-                : operation === 'SELECT'
-                ? 'SELECT * WHERE'
-                : ''
-        } { ${this._graph ? `GRAPH ${this._graph} { ` : ''}${
-            this._subject
-        } ${this._attributes
-            .map((a) => {
-                return `${a.predicate} ${
-                    a.type === 'LITERAL' ? `${a.object}` : `"${a.object}"`
-                }`;
-            })
-            .join('; ')} . }${this._graph ? ` }` : ''}`;
-    }
-}
+//     sparql(operation: Operation) {
+//         if (!this._subject) throw new Error('No subject provided');
+//         if (!this._attributes.length) throw new Error('No attributes provided');
+
+//         const namespaceStr = !!this._namespaces
+//             ? Object.entries(this._namespaces)
+//                   .map(([key, value]) => {
+//                       return `PREFIX ${key}: <${value}>`;
+//                   })
+//                   .join(' ') + ' '
+//             : '';
+
+//         let optionalAttributes: Attribute[] = [];
+
+//         this._attributes.filter((a) => {});
+
+//         return `${namespaceStr}${
+//             operation === 'INSERT'
+//                 ? 'INSERT DATA'
+//                 : operation === 'SELECT'
+//                 ? 'SELECT * WHERE'
+//                 : ''
+//         } { ${this._graph ? `GRAPH ${this._graph} { ` : ''}${
+//             this._subject
+//         } ${this._attributes
+//             .map((a) => {
+//                 return `${a.predicate} ${
+//                     a.type === 'LITERAL' ? `${a.object}` : `"${a.object}"`
+//                 }`;
+//             })
+//             .join('; ')} . }${this._graph ? ` }` : ''}`;
+//     }
+// }

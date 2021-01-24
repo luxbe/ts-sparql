@@ -1,16 +1,11 @@
-import { isIEntity, TempStorage } from './entity';
+import IdMetadata from '../interfaces/id.metadata';
 
-export function Id(name?: string) {
+export function Id() {
     return (target: object, key: string) => {
-        if (!isIEntity(target)) {
-            const data: TempStorage = {
-                idKey: key,
-                name: '',
-                properties: [],
-            };
-            (target as any).__tssparql__ = data;
-        } else {
-            target.__tssparql__.idKey = key;
-        }
+        Reflect.defineMetadata(
+            IdMetadata.METADATA_KEY,
+            key,
+            target.constructor,
+        );
     };
 }

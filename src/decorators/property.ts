@@ -1,27 +1,39 @@
-import TsSparql from '..';
-import { Storage } from '../storage';
-import { IEntity, isIEntity, TempStorage } from './entity';
+import 'reflect-metadata';
+import { Property } from '../interfaces';
+import { PropertyMetadata } from '../interfaces/property.metadata';
+import Iri from '../iri';
 
-export function Property(iri: string, name?: string) {
+interface Options {
+    optional?: boolean;
+}
+
+export function Property(iri: Iri | string, options: Options = {}) {
     return (target: object, key: string) => {
-        if ((target as IEntity).__tssparql__ == undefined) {
-            const data: TempStorage = {
-                idKey: '',
-                name: '',
-                properties: [],
-            };
-            (target as any).__tssparql__ = data;
-        }
+        if (typeof iri === 'string') iri = Iri.init(iri);
 
-        // filter out prefix and predicate from iri
-        const matches = iri.match(/(.+?):(.*)/) || [];
-        const namespace = matches[1];
-        const predicate = matches[2];
+        let properties: Property[] =
+            Reflect.getMetadata(
+                PropertyMetadata.METADATA_KEY,
+                target.constructor,
+            ) || [];
 
-        (target as IEntity).__tssparql__.properties?.push({
+        const datatype = (Reflect.getMetadata(
+            'design:type',
+            target,
             key,
-            namespace,
-            predicate,
+        ).name ||= 'String');
+
+        properties.push({
+            key,
+            iri,
+            optional: options.optional || false,
+            datatype,
         });
+
+        Reflect.defineMetadata(
+            PropertyMetadata.METADATA_KEY,
+            properties,
+            target.constructor,
+        );
     };
 }
