@@ -1,4 +1,4 @@
-import IdMetadata from '../interfaces/id.metadata';
+import { IdMetadata } from '../interfaces';
 
 export function Id() {
     return (target: object, key: string) => {

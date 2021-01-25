@@ -7,7 +7,7 @@ export interface Options {
     global: boolean;
 }
 
-export class PrefixMetadata {
+export default class PrefixMetadata {
     static METADATA_KEY = 'tssparql:prefixes';
     static VALUE: {
         prefixes: Prefixes;
