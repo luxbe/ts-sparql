@@ -3,7 +3,6 @@ import XSD from './namespaces/xsd.namespace';
 
 export default class PrefixManager {
     private static _prefixes: {
-        [XSD.PREFIX]: string;
         [key: string]: string;
     } = {
         [XSD.PREFIX]: XSD.NAMESPACE,
@@ -13,15 +12,14 @@ export default class PrefixManager {
         prefix: string,
         namespace: string,
         override = false,
-        key?: string,
+        name?: string,
     ) {
-        const prefixes = key
-            ? (Metadata.global.storage.namespaces[key] ||= {})
+        const prefixes = name
+            ? (Metadata.global.storage.namespaces[name] ||= {})
             : this._prefixes;
 
         if (Object.keys(prefixes).includes(prefix) && !override)
             throw new Error(`Prefix ${prefix} is already defined`);
-
         prefixes[prefix] = namespace;
     }
 
