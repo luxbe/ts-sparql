@@ -2,7 +2,7 @@ import { Property } from '../interfaces';
 import PrefixManager from '../prefixManager';
 import { DataMapper } from './mapper.data';
 
-export class Mapper {
+export class SPARQLMapper {
     private dataMapper = DataMapper.global;
 
     private s?: string;
@@ -15,17 +15,17 @@ export class Mapper {
         return this;
     }
 
-    properties(properties: Property[]) {
+    properties(properties: Property[], name?: string) {
         this.p = properties
             .filter((p) => p.value != undefined)
             .map((p) => {
                 const { prefix } = p.iri;
                 if (prefix.length > 0 && !Object.keys(this.n).includes(prefix))
-                    this.n[prefix] = PrefixManager.get(prefix);
+                    this.n[prefix] = PrefixManager.get(prefix, name);
 
                 return {
                     ...p,
-                    value: this.dataMapper.map(p.value, p.datatype),
+                    value: this.dataMapper.mapToString(p.value, p.datatype),
                 };
             });
         return this;
