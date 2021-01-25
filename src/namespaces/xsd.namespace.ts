@@ -9,7 +9,7 @@ export default class XSD {
     /**
      * A common prefix for the Vocabulary
      */
-    static PREFIX: 'xsd';
+    static PREFIX = 'xsd';
 
     /**
      * XML Schema data type
