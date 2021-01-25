@@ -1,9 +1,9 @@
-import { EntityStorage, Storage } from '../interfaces';
+import { EntityStorage, Storage, Type } from '../interfaces';
 
 export class Metadata {
     private static _instance: Metadata;
     public storage: Storage;
-    private name?: string;
+    private _name?: string;
 
     private constructor() {
         this.storage = {
@@ -15,6 +15,12 @@ export class Metadata {
         };
     }
 
+    private set name(name: string) {
+        if (!this.storage.entities.includes(name))
+            throw new Error(`${name} is not an Entity`);
+        this._name = name;
+    }
+
     public static get global() {
         if (!Metadata._instance) {
             Metadata._instance = new Metadata();
@@ -22,25 +28,27 @@ export class Metadata {
         return Metadata._instance;
     }
 
+    entityType<T>(type: Type<T> | string) {
+        if (typeof type == 'string') this.name = type;
+        else this.name = type.name;
+        return this;
+    }
+
     entityInstance<T extends object>(entity: T) {
         this.name = entity.constructor.name;
-
-        if (!this.storage.entities.includes(this.name))
-            throw new Error(`${this.name} is not an Entity`);
-
         return this;
     }
 
     public getMetadata<T>(): EntityStorage {
-        if (this.name == undefined) throw new Error(`No name defined`);
+        if (this._name == undefined) throw new Error(`No name defined`);
 
-        const idKey = this.storage.idKeys[this.name];
-        const properties = (this.storage.properties[this.name] ||= []);
-        const type = this.storage.types[this.name];
-        const namespaces = this.storage.namespaces[this.name];
+        const idKey = this.storage.idKeys[this._name];
+        const properties = (this.storage.properties[this._name] ||= []);
+        const type = this.storage.types[this._name];
+        const namespaces = this.storage.namespaces[this._name];
 
         return {
-            name: this.name,
+            name: this._name,
             idKey,
             properties,
             type,
