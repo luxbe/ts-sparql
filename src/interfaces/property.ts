@@ -6,4 +6,5 @@ export interface Property {
     datatype: any;
     iri: Iri;
     optional: boolean;
+    entity?: string;
 }

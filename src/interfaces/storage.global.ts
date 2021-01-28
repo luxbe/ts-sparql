@@ -1,9 +1,13 @@
 import Iri from '../iri';
 import { Property } from './property';
+import { Type } from './type';
 
 export interface Storage {
     entities: string[];
     types: {
+        [key: string]: Iri;
+    };
+    graphs: {
         [key: string]: Iri;
     };
     idKeys: {
@@ -16,5 +20,8 @@ export interface Storage {
         [key: string]: {
             [key: string]: string;
         };
+    };
+    constructors: {
+        [key: string]: Type<any>;
     };
 }

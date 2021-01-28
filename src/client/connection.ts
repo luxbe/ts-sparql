@@ -1,23 +1,9 @@
+import { Response } from '../interfaces';
 import request from './request';
 
 interface Options {
     url: string;
     repository: string;
-}
-
-export interface Response {
-    head: {
-        vars: string[];
-    };
-    results: {
-        bindings: {
-            [key: string]: {
-                datatype?: string;
-                type: string;
-                value: string;
-            };
-        }[];
-    };
 }
 
 export class Connection {
@@ -29,20 +15,20 @@ export class Connection {
         this.repository = options.repository;
     }
 
-    static async init(options: Options): Promise<Connection> {
-        return request(`${options.url}/repositories`, {
-            headers: {
-                accept: 'application/json',
-            },
-        }).then((res) => {
-            const index = (res as Response).results.bindings.findIndex(
-                (b) => b.id.value === options.repository,
-            );
-            if (index === -1)
-                throw new Error(`repository '${options.repository}' not found`);
-            return new Connection(options);
-        });
-    }
+    // static async init(options: Options): Promise<Connection> {
+    //     return request(`${options.url}/repositories`, {
+    //         headers: {
+    //             accept: 'application/json',
+    //         },
+    //     }).then((res) => {
+    //         const index = (res as Response).results.bindings.findIndex(
+    //             (b) => b.id.value === options.repository,
+    //         );
+    //         if (index === -1)
+    //             throw new Error(`repository '${options.repository}' not found`);
+    //         return new Connection(options);
+    //     });
+    // }
 
     get(
         query: string,

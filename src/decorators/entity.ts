@@ -3,9 +3,13 @@ import Iri from '../iri';
 import { Metadata } from '../metadata';
 import PrefixManager from '../prefixManager';
 
-export function Entity(iri: Iri | string) {
+export function Entity(options: { iri: Iri | string; graph?: Iri | string }) {
     return <T extends new (...args: any[]) => {}>(constructor: T) => {
-        if (typeof iri === 'string') iri = Iri.init(iri);
+        if (typeof options.iri === 'string')
+            options.iri = Iri.init(options.iri);
+        if (options.graph != undefined && typeof options.graph === 'string')
+            options.graph = Iri.init(options.graph);
+
         const key = constructor.name;
 
         const idKey = Reflect.getMetadata('tssparql:idKey', constructor) as
@@ -42,7 +46,10 @@ export function Entity(iri: Iri | string) {
         }
 
         Metadata.global.storage.entities.push(key);
-        Metadata.global.storage.types[key] = iri;
+        Metadata.global.storage.types[key] = options.iri;
+        Metadata.global.storage.constructors[key] = constructor;
+        if (options.graph != undefined)
+            Metadata.global.storage.graphs[key] = options.graph;
 
         return constructor;
     };

@@ -4,6 +4,7 @@ import Iri from '../iri';
 
 interface Options {
     optional?: boolean;
+    entity?: string;
 }
 
 export function Property(iri: Iri | string, options: Options = {}) {
@@ -26,6 +27,7 @@ export function Property(iri: Iri | string, options: Options = {}) {
             key,
             iri,
             optional: options.optional || false,
+            entity: options.entity,
             datatype,
         });
 

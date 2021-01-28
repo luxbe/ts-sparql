@@ -12,6 +12,8 @@ export class Metadata {
             types: {},
             properties: {},
             namespaces: {},
+            graphs: {},
+            constructors: {},
         };
     }
 
@@ -44,6 +46,7 @@ export class Metadata {
 
         const idKey = this.storage.idKeys[this._name];
         const properties = (this.storage.properties[this._name] ||= []);
+        const graph = this.storage.graphs[this._name];
         const type = this.storage.types[this._name];
         const namespaces = this.storage.namespaces[this._name];
 
@@ -51,6 +54,7 @@ export class Metadata {
             name: this._name,
             idKey,
             properties,
+            graph,
             type,
             namespaces,
         };

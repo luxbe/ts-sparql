@@ -42,6 +42,6 @@ export default class Iri {
     public toString() {
         return this._prefix
             ? `${this._prefix}:${this._predicate}`
-            : `<${this._predicate}>`;
+            : `${this._predicate}`;
     }
 }

@@ -1,3 +1,4 @@
+import TsSparql from '..';
 import { Type } from '../interfaces';
 import { Metadata } from '../metadata';
 import { XSD } from '../namespaces';
@@ -41,6 +42,7 @@ export class DataMapper {
 
         DataMapper.global._objectMappers[datatype] = map;
     }
+
     public static registerStringMap<T>(
         datatype: string | Type<T>,
         map: (value: string) => any,
@@ -63,12 +65,12 @@ export class DataMapper {
         if (!Object.keys(this._stringMappers).includes(datatype)) {
             if (!this._metadata.storage.entities.includes(datatype))
                 return value.toString();
+
             const { type, idKey } = this._metadata
                 .entityType(datatype)
                 .getMetadata();
-            type.setPredicate(type.predicate + value[idKey]);
 
-            return type.toString();
+            return `<${type.toString()}${value[idKey]}>`;
         }
 
         return this._stringMappers[datatype](value);
