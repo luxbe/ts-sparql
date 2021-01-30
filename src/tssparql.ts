@@ -71,7 +71,7 @@ export class TsSparql {
             id?: string;
         } = {},
     ): Promise<T[]> {
-        if (TsSparql.client == undefined)
+        if (TsSparql.client === undefined)
             throw new Error('No client configured');
 
         const _entityType =
@@ -102,8 +102,8 @@ export class TsSparql {
             .idKey(idKey)
             .properties(properties, name);
 
-        if (graph != undefined) mapper.graph(`<${graph.toString()}>`);
-        if (options.id != undefined) mapper.id(type + options.id);
+        if (graph !== undefined) mapper.graph(`<${graph.toString()}>`);
+        if (options.id !== undefined) mapper.id(type + options.id);
 
         const sparql = mapper.sparql('SELECT');
 
@@ -114,16 +114,14 @@ export class TsSparql {
 
             const res = [];
 
-            for (let i = 0; i < _res.results.bindings.length; i++) {
-                const b = _res.results.bindings[i];
-
+            for (let b of _res.results.bindings) {
                 const entity = this.entityMapper.map(
                     _entityType,
                     b,
                     options.id,
                 );
 
-                let entities: { key: string; value: string }[] = [];
+                const entities: { key: string; value: string }[] = [];
                 Object.entries(b).forEach(([key, v]) => {
                     if (
                         v.type === 'uri' &&
@@ -133,17 +131,16 @@ export class TsSparql {
                         entities.push({ key, value: v.value });
                 });
 
-                for (let i = 0; i < entities.length; i++) {
-                    const e = entities[i];
-                    const type = entProperties[e.key];
+                for (let e of entities) {
+                    const _entType = entProperties[e.key];
 
                     const id = e.value.substr(
-                        this.metadata.storage.types[type].toString().length,
+                        this.metadata.storage.types[_entType].toString().length,
                     );
 
-                    const en = await this.getById(type, id);
+                    const en = await this.getById(_entType, id);
 
-                    (<any>entity)[e.key] = en;
+                    (entity as any)[e.key] = en;
                 }
 
                 res.push(entity);
@@ -153,7 +150,7 @@ export class TsSparql {
     }
 
     save<T extends object>(entity: T): Promise<void> {
-        if (TsSparql.client == undefined)
+        if (TsSparql.client === undefined)
             throw new Error('No client configured');
 
         const {
@@ -168,29 +165,29 @@ export class TsSparql {
 
         // get id
         const id = (entity as any)[idKey];
-        let properties: Property[] = [];
+        const properties: Property[] = [];
 
         _p.forEach((p) => {
             p.value = (entity as any)[p.key];
 
             if (p.datatype === 'Array') {
-                const { iri, entity, key, optional } = p;
+                const { iri, entity: propEntity, key, optional } = p;
                 const values = p.value as any[];
 
-                if (values == undefined) return false;
+                if (values === undefined) return false;
                 properties.push(
                     ...values
                         .map<Property>((value) => {
                             return {
                                 datatype: value.constructor.name,
                                 iri,
-                                entity,
+                                entity: propEntity,
                                 key,
                                 optional,
                                 value,
                             };
                         })
-                        .filter((p) => p.value !== undefined),
+                        .filter((_p) => _p.value !== undefined),
                 );
             } else {
                 properties.push(p);
@@ -201,13 +198,13 @@ export class TsSparql {
             if (p.entity !== undefined && p.value !== undefined) {
                 entities.push(p.value);
             }
-            return p.value != undefined;
+            return p.value !== undefined;
         });
 
         const mapper = this.sparqlMapper
             .subject(`<${type.toString()}${id}>`)
             .properties(properties, name);
-        if (graph != undefined) mapper.graph(`<${graph.toString()}>`);
+        if (graph !== undefined) mapper.graph(`<${graph.toString()}>`);
 
         const sparql = mapper.sparql('INSERT');
 

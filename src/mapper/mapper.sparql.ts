@@ -32,7 +32,7 @@ export class SPARQLMapper {
             const { prefix } = p.iri;
             if (prefix.length > 0 && !Object.keys(this.n).includes(prefix))
                 this.n[prefix] = PrefixManager.get(prefix, name);
-            if (p.value != undefined) {
+            if (p.value !== undefined) {
                 p.value = this.dataMapper.mapToString(p.value, p.datatype);
             }
             return p;
@@ -45,16 +45,16 @@ export class SPARQLMapper {
     }
 
     sparql(operation: 'INSERT' | 'SELECT'): string {
-        if (this.s == undefined && operation !== 'SELECT')
+        if (this.s === undefined && operation !== 'SELECT')
             throw new Error(`Subject is not defined`);
 
-        // if (this._idKey == undefined && operation === 'SELECT')
+        // if (this._idKey===undefined && operation === 'SELECT')
         //     throw new Error(`IdKey is not defined`);
 
-        // if (this._id == undefined && operation === 'SELECT')
+        // if (this._id===undefined && operation === 'SELECT')
         //     throw new Error(`Id is not defined`);
 
-        if (this.p == undefined || this.p.length == 0)
+        if (this.p === undefined || this.p.length === 0)
             throw new Error(`Properties are not defined`);
 
         switch (operation) {
@@ -70,9 +70,9 @@ export class SPARQLMapper {
             .map(([prefix, namespace]) => `PREFIX ${prefix}: <${namespace}>`)
             .join(' ');
 
-        let vars = '',
-            op: string[] = [],
-            nop: string[] = [];
+        let vars = '';
+        const op: string[] = [];
+        const nop: string[] = [];
 
         const idStr = this._id ? this._id : `?${this._idKey}`;
 
@@ -104,7 +104,7 @@ export class SPARQLMapper {
             (p) => `${p.iri} ${p.value}`,
         ).join('; ')} .`;
         const graphStr =
-            this.g != undefined
+            this.g !== undefined
                 ? ` GRAPH ${this.g} { ${insertStr} }`
                 : insertStr;
         return `${prefStr} INSERT DATA { ${graphStr} }`;

@@ -25,12 +25,12 @@ export default class PrefixManager {
 
     static get(prefix: string, key?: string) {
         let res;
-        if (key != undefined) {
+        if (key !== undefined) {
             res = (Metadata.global.storage.namespaces[key] ||= {})[prefix];
         }
-        if (res == undefined) res = this._prefixes[prefix];
+        if (res === undefined) res = this._prefixes[prefix];
 
-        if (res == undefined)
+        if (res === undefined)
             throw new Error(`Prefix ${prefix} is not defined`);
 
         return res;

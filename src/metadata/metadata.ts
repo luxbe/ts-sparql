@@ -31,7 +31,7 @@ export class Metadata {
     }
 
     entityType<T>(type: Type<T> | string) {
-        if (typeof type == 'string') this.name = type;
+        if (typeof type === 'string') this.name = type;
         else this.name = type.name;
         return this;
     }
@@ -42,7 +42,7 @@ export class Metadata {
     }
 
     public getMetadata<T>(): EntityStorage {
-        if (this._name == undefined) throw new Error(`No name defined`);
+        if (this._name === undefined) throw new Error(`No name defined`);
 
         const idKey = this.storage.idKeys[this._name];
         const properties = (this.storage.properties[this._name] ||= []);

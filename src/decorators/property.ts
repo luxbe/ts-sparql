@@ -11,7 +11,7 @@ export function Property(iri: Iri | string, options: Options = {}) {
     return (target: object, key: string) => {
         if (typeof iri === 'string') iri = Iri.init(iri);
 
-        let properties: Property[] =
+        const properties: Property[] =
             Reflect.getMetadata(
                 PropertyMetadata.METADATA_KEY,
                 target.constructor,

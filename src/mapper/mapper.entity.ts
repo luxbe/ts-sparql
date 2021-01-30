@@ -30,7 +30,7 @@ export class EntityMapper {
         properties.forEach((p) => {
             const b = binding[p.key];
 
-            if (b == undefined) return;
+            if (b === undefined) return;
 
             entity[p.key] = this.dataMapper.mapFromString(
                 binding[p.key].value,

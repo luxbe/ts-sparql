@@ -15,7 +15,7 @@ export class DataMapper {
     } = {
         String: (value) => `"${value}"`,
         Date: (value) => `"${(value as Date).toISOString()}"^^<${XSD.DATE}>`,
-        Boolean: (value) => `"${value as Boolean}"^^<${XSD.BOOLEAN}>`,
+        Boolean: (value) => `"${value as boolean}"^^<${XSD.BOOLEAN}>`,
     };
 
     private constructor() {}
@@ -32,7 +32,7 @@ export class DataMapper {
         map: (value: any) => string,
         override: boolean = false,
     ) {
-        if (typeof datatype != 'string') datatype = datatype.name;
+        if (typeof datatype !== 'string') datatype = datatype.name;
 
         if (
             Object.keys(DataMapper.global._objectMappers).includes(datatype) &&
@@ -48,7 +48,7 @@ export class DataMapper {
         map: (value: string) => any,
         override: boolean = false,
     ) {
-        if (typeof datatype != 'string') datatype = datatype.name;
+        if (typeof datatype !== 'string') datatype = datatype.name;
 
         if (
             Object.keys(DataMapper.global._stringMappers).includes(datatype) &&
@@ -60,7 +60,7 @@ export class DataMapper {
     }
 
     mapToString<T>(value: any, datatype: Type<T> | string): string {
-        if (typeof datatype != 'string') datatype = datatype.name;
+        if (typeof datatype !== 'string') datatype = datatype.name;
 
         if (!Object.keys(this._stringMappers).includes(datatype)) {
             if (!this._metadata.storage.entities.includes(datatype))

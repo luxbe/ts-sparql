@@ -8,14 +8,14 @@ export default class Iri {
     }
 
     static init(predicate: string, prefix?: string) {
-        if (prefix != undefined) {
+        if (prefix !== undefined) {
             return new Iri(prefix, predicate);
         }
         if (/<.+>/.test(predicate))
             return new Iri('', predicate.substr(1, predicate.length - 2));
 
         const matches = predicate.match(/(.+):([a-zA-Z0-9]+)/);
-        if (matches == undefined)
+        if (matches === null)
             throw new Error(`${predicate} is not a valid iri`);
 
         return new Iri(matches[1], matches[2]);

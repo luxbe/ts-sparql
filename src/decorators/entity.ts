@@ -7,7 +7,7 @@ export function Entity(options: { iri: Iri | string; graph?: Iri | string }) {
     return <T extends new (...args: any[]) => {}>(constructor: T) => {
         if (typeof options.iri === 'string')
             options.iri = Iri.init(options.iri);
-        if (options.graph != undefined && typeof options.graph === 'string')
+        if (options.graph !== undefined && typeof options.graph === 'string')
             options.graph = Iri.init(options.graph);
 
         const key = constructor.name;
@@ -16,21 +16,21 @@ export function Entity(options: { iri: Iri | string; graph?: Iri | string }) {
             | typeof IdMetadata.VALUE
             | undefined;
 
-        if (idKey != undefined) Metadata.global.storage.idKeys[key] = idKey;
+        if (idKey !== undefined) Metadata.global.storage.idKeys[key] = idKey;
 
         const _prefixMetadata = Reflect.getMetadata(
             'tssparql:prefixes',
             constructor,
         ) as typeof PrefixMetadata.VALUE | undefined;
 
-        if (_prefixMetadata != undefined) {
-            const { prefixes, options } = _prefixMetadata;
+        if (_prefixMetadata !== undefined) {
+            const { prefixes, options: prefixOptions } = _prefixMetadata;
             Object.entries(prefixes).forEach(([prefix, namespace]) => {
                 PrefixManager.add(
                     prefix,
                     namespace,
-                    options.override,
-                    options.global ? undefined : key,
+                    prefixOptions.override,
+                    prefixOptions.global ? undefined : key,
                 );
             });
         }
@@ -40,7 +40,7 @@ export function Entity(options: { iri: Iri | string; graph?: Iri | string }) {
             constructor,
         ) as typeof PropertyMetadata.VALUE | undefined;
 
-        if (properties != undefined) {
+        if (properties !== undefined) {
             Metadata.global.storage.properties[key] ||= [];
             Metadata.global.storage.properties[key].push(...properties);
         }
@@ -48,7 +48,7 @@ export function Entity(options: { iri: Iri | string; graph?: Iri | string }) {
         Metadata.global.storage.entities.push(key);
         Metadata.global.storage.types[key] = options.iri;
         Metadata.global.storage.constructors[key] = constructor;
-        if (options.graph != undefined)
+        if (options.graph !== undefined)
             Metadata.global.storage.graphs[key] = options.graph;
 
         return constructor;
