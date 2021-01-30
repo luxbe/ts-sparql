@@ -114,7 +114,7 @@ export class TsSparql {
 
             const res = [];
 
-            for (let b of _res.results.bindings) {
+            for (const b of _res.results.bindings) {
                 const entity = this.entityMapper.map(
                     _entityType,
                     b,
@@ -131,7 +131,7 @@ export class TsSparql {
                         entities.push({ key, value: v.value });
                 });
 
-                for (let e of entities) {
+                for (const e of entities) {
                     const _entType = entProperties[e.key];
 
                     const id = e.value.substr(
@@ -187,7 +187,7 @@ export class TsSparql {
                                 value,
                             };
                         })
-                        .filter((_p) => _p.value !== undefined),
+                        .filter((__p) => __p.value !== undefined),
                 );
             } else {
                 properties.push(p);
