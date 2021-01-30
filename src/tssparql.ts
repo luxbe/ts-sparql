@@ -187,7 +187,7 @@ export class TsSparql {
                                 value,
                             };
                         })
-                        .filter((__p) => __p.value !== undefined),
+                        .filter((_property) => _property.value !== undefined),
                 );
             } else {
                 properties.push(p);
