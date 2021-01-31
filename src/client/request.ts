@@ -14,19 +14,16 @@ export default function request(
             });
 
             res.on('end', () => {
-                if (data.length > 0) {
-                    if (
-                        res.headers['content-type'] &&
-                        res.headers['content-type'].includes('text/plain')
-                    )
-                        return;
+                if (
+                    data.length > 0 &&
+                    res.headers['content-type'] !== undefined &&
+                    !res.headers['content-type'].includes('text/plain')
+                )
                     data = JSON.parse(data);
-                }
-                if (res.statusCode === 200 || res.statusCode === 204) {
+
+                if (res.statusCode === 200 || res.statusCode === 204)
                     resolve(data);
-                } else {
-                    reject(data);
-                }
+                else reject(data);
             });
         });
 
