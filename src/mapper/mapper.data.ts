@@ -16,7 +16,7 @@ export class DataMapper {
         String: (value) => `"${value}"`,
         Date: (value) => `"${(value as Date).toISOString()}"^^<${XSD.DATE}>`,
         Boolean: (value) => `"${value as boolean}"^^<${XSD.BOOLEAN}>`,
-        Iri: (value) => (value as Iri).toString(),
+        Iri: (value) => `<${(value as Iri).toString()}>`,
     };
 
     public static get global() {
