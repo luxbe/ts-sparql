@@ -13,4 +13,9 @@ export default class RDFS {
      * The resource is an instance of a class
      */
     static CLASS = RDFS.NAMESPACE + 'Class';
+
+    /**
+     * The resource is an instance of a class
+     */
+    static LABEL = RDFS.NAMESPACE + 'label';
 }
