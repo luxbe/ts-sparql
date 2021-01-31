@@ -1,11 +1,14 @@
 import { Metadata } from './metadata';
+import { RDF, RDFS } from './namespaces';
 import XSD from './namespaces/xsd.namespace';
 
-export default class PrefixManager {
+export class PrefixManager {
     private static _prefixes: {
         [key: string]: string;
     } = {
         [XSD.PREFIX]: XSD.NAMESPACE,
+        [RDF.PREFIX]: RDF.NAMESPACE,
+        [RDFS.PREFIX]: RDFS.NAMESPACE,
     };
 
     static add(
