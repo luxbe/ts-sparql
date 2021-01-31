@@ -5,10 +5,9 @@ import { PrefixManager } from '../prefixManager';
 
 export function Entity(options: { iri: Iri | string; graph?: Iri | string }) {
     return <T extends new (...args: any[]) => {}>(constructor: T) => {
-        if (typeof options.iri === 'string')
-            options.iri = Iri.init(options.iri);
+        if (typeof options.iri === 'string') options.iri = new Iri(options.iri);
         if (options.graph !== undefined && typeof options.graph === 'string')
-            options.graph = Iri.init(options.graph);
+            options.graph = new Iri(options.graph);
 
         const key = constructor.name;
 

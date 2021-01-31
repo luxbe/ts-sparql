@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Property, PropertyMetadata } from '../interfaces';
+import { Property as IProperty, PropertyMetadata } from '../interfaces';
 import { Iri } from '../iri';
 
 interface Options {
@@ -9,9 +9,9 @@ interface Options {
 
 export function Property(iri: Iri | string, options: Options = {}) {
     return (target: object, key: string) => {
-        if (typeof iri === 'string') iri = Iri.init(iri);
+        if (typeof iri === 'string') iri = new Iri(iri);
 
-        const properties: Property[] =
+        const properties: IProperty[] =
             Reflect.getMetadata(
                 PropertyMetadata.METADATA_KEY,
                 target.constructor,
