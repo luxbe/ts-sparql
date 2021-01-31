@@ -30,7 +30,7 @@ export class SPARQLMapper {
     properties(properties: Property[], name?: string) {
         this.p = properties.map((p) => {
             const { prefix } = p.iri;
-            if (prefix.length > 0 && !Object.keys(this.n).includes(prefix))
+            if (prefix !== undefined && !Object.keys(this.n).includes(prefix))
                 this.n[prefix] = PrefixManager.get(prefix, name);
             if (p.value !== undefined) {
                 p.value = this.dataMapper.mapToString(p.value, p.datatype);
@@ -47,12 +47,6 @@ export class SPARQLMapper {
     sparql(operation: 'INSERT' | 'SELECT'): string {
         if (this.s === undefined && operation !== 'SELECT')
             throw new Error(`Subject is not defined`);
-
-        // if (this._idKey===undefined && operation === 'SELECT')
-        //     throw new Error(`IdKey is not defined`);
-
-        // if (this._id===undefined && operation === 'SELECT')
-        //     throw new Error(`Id is not defined`);
 
         if (this.p === undefined || this.p.length === 0)
             throw new Error(`Properties are not defined`);
@@ -97,16 +91,18 @@ export class SPARQLMapper {
     }
 
     insert(): string {
-        const prefStr = Object.entries(this.n)
+        let prefStr = Object.entries(this.n)
             .map(([prefix, namespace]) => `PREFIX ${prefix}: <${namespace}>`)
             .join(' ');
+        prefStr = prefStr.length ? prefStr + ' ' : '';
+
         const insertStr = `${this.s} ${this.p!.map(
-            (p) => `${p.iri} ${p.value}`,
+            (p) => p.iri.toSparql() + ' ' + p.value,
         ).join('; ')} .`;
         const graphStr =
             this.g !== undefined
-                ? ` GRAPH ${this.g} { ${insertStr} }`
+                ? `GRAPH ${this.g} { ${insertStr} }`
                 : insertStr;
-        return `${prefStr} INSERT DATA { ${graphStr} }`;
+        return `${prefStr}INSERT DATA { ${graphStr} }`;
     }
 }
