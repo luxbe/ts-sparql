@@ -64,6 +64,10 @@ export class TsSparql {
         });
     }
 
+    getAll<T extends object>(entityType: Type<T> | string): Promise<T[]> {
+        return this.query(entityType);
+    }
+
     query<T extends object>(
         entityType: Type<T> | string,
         options: {
