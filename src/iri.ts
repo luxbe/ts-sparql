@@ -1,4 +1,4 @@
-export default class Iri {
+export class Iri {
     private _prefix: string;
     private _predicate: string;
 

@@ -1,7 +1,7 @@
 import { Client } from './client';
 import { Property, Response, Type } from './interfaces';
 import { Condition } from './interfaces/condition';
-import Iri from './iri';
+import { Iri } from './iri';
 import { EntityMapper, SPARQLMapper } from './mapper';
 import { Metadata } from './metadata';
 

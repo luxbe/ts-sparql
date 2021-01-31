@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { Property, PropertyMetadata } from '../interfaces';
-import Iri from '../iri';
+import { Iri } from '../iri';
 
 interface Options {
     optional?: boolean;

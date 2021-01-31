@@ -1,4 +1,5 @@
 import { Type } from '../interfaces';
+import { Iri } from '../iri';
 import { Metadata } from '../metadata';
 import { XSD } from '../namespaces';
 
@@ -15,6 +16,7 @@ export class DataMapper {
         String: (value) => `"${value}"`,
         Date: (value) => `"${(value as Date).toISOString()}"^^<${XSD.DATE}>`,
         Boolean: (value) => `"${value as boolean}"^^<${XSD.BOOLEAN}>`,
+        Iri: (value) => (value as Iri).toString(),
     };
 
     public static get global() {

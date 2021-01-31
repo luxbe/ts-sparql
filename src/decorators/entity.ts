@@ -1,5 +1,5 @@
 import { IdMetadata, PrefixMetadata, PropertyMetadata } from '../interfaces';
-import Iri from '../iri';
+import { Iri } from '../iri';
 import { Metadata } from '../metadata';
 import { PrefixManager } from '../prefixManager';
 

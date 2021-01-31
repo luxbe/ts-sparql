@@ -1,4 +1,4 @@
-import Iri from '../iri';
+import { Iri } from '../iri';
 import { Property } from './property';
 import { Type } from './type';
 
