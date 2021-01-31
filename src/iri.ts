@@ -8,6 +8,8 @@ export default class Iri {
     }
 
     static init(predicate: string, prefix?: string) {
+        predicate = predicate.trim();
+        prefix = prefix ? prefix.trim() : undefined;
         if (prefix !== undefined) {
             return new Iri(prefix, predicate);
         }
@@ -26,12 +28,12 @@ export default class Iri {
     }
 
     setPrefix(prefix: string) {
-        this._prefix = prefix;
+        this._prefix = prefix.trim();
         return this;
     }
 
     setPredicate(predicate: string) {
-        this._predicate = predicate;
+        this._predicate = predicate.trim();
         return this;
     }
 
