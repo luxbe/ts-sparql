@@ -1,26 +1,28 @@
 export class Iri {
-    private _prefix: string;
+    private _prefix?: string;
     private _predicate: string;
+    private _validCharacterRegex = /[a-zA-Z0-9]+/;
 
-    private constructor(prefix: string, predicate: string) {
-        this._prefix = prefix;
-        this._predicate = predicate;
-    }
-
-    static init(predicate: string, prefix?: string) {
+    constructor(predicate: string, prefix?: string) {
         predicate = predicate.trim();
-        prefix = prefix ? prefix.trim() : undefined;
-        if (prefix !== undefined) {
-            return new Iri(prefix, predicate);
+        // check if predicate is valid full iri
+        if (/^https?:\/\/.+$/.test(predicate)) {
+            this._predicate = predicate;
+        } else {
+            if (prefix === undefined)
+                throw new Error(`${predicate} is not a valid iri`);
+            prefix = prefix.trim();
+            if (!this._validCharacterRegex.test(predicate))
+                throw new Error(
+                    `Predicate '${predicate}' contains illegal characters`,
+                );
+            if (!this._validCharacterRegex.test(prefix))
+                throw new Error(
+                    `Prefix '${prefix}' contains illegal characters`,
+                );
+            this._predicate = predicate;
+            this._prefix = prefix;
         }
-        if (/<.+>/.test(predicate))
-            return new Iri('', predicate.substr(1, predicate.length - 2));
-
-        const matches = predicate.match(/(.+):([a-zA-Z0-9]+)/);
-        if (matches === null)
-            throw new Error(`${predicate} is not a valid iri`);
-
-        return new Iri(matches[1], matches[2]);
     }
 
     get prefix() {
@@ -43,7 +45,13 @@ export class Iri {
 
     public toString() {
         return this._prefix
-            ? `${this._prefix}:${this._predicate}`
-            : `${this._predicate}`;
+            ? this._prefix + ':' + this._predicate
+            : this._predicate;
+    }
+
+    public toSparql() {
+        return this._prefix
+            ? this._prefix + ':' + this._predicate
+            : '<' + this._predicate + '>';
     }
 }
