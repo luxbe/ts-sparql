@@ -1,4 +1,3 @@
-import TsSparql from '..';
 import { Type } from '../interfaces';
 import { Metadata } from '../metadata';
 import { XSD } from '../namespaces';
@@ -17,8 +16,6 @@ export class DataMapper {
         Date: (value) => `"${(value as Date).toISOString()}"^^<${XSD.DATE}>`,
         Boolean: (value) => `"${value as boolean}"^^<${XSD.BOOLEAN}>`,
     };
-
-    private constructor() {}
 
     public static get global() {
         if (!DataMapper._instance) {
