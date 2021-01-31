@@ -1,5 +1,5 @@
 import { Property } from '../interfaces';
-import PrefixManager from '../prefixManager';
+import { PrefixManager } from '../prefixManager';
 import { DataMapper } from './mapper.data';
 
 export class SPARQLMapper {

@@ -1,7 +1,7 @@
 import { IdMetadata, PrefixMetadata, PropertyMetadata } from '../interfaces';
 import Iri from '../iri';
 import { Metadata } from '../metadata';
-import PrefixManager from '../prefixManager';
+import { PrefixManager } from '../prefixManager';
 
 export function Entity(options: { iri: Iri | string; graph?: Iri | string }) {
     return <T extends new (...args: any[]) => {}>(constructor: T) => {
