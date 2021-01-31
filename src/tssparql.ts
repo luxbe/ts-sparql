@@ -212,13 +212,15 @@ export class TsSparql {
 
         const sparql = mapper.sparql('INSERT');
 
+        console.log(sparql);
+
         entities.forEach((e) => this.save(e));
 
         const connection = TsSparql.client?.getConnection();
 
         return connection!
             .post(sparql)
-            .then(() => TsSparql.client?.releaseConnection(connection!));
+            .finally(() => TsSparql.client?.releaseConnection(connection!));
     }
 
     // search();
