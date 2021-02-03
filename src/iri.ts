@@ -9,8 +9,18 @@ export class Iri {
         if (/^https?:\/\/.+$/.test(predicate)) {
             this._predicate = predicate;
         } else {
-            if (prefix === undefined)
-                throw new Error(`${predicate} is not a valid iri`);
+            if (prefix === undefined) {
+                const matches = predicate.match(
+                    /([a-zA-Z0-9]+):([a-zA-Z0-9]+)/,
+                );
+
+                if (matches === undefined || matches === null)
+                    throw new Error(`${predicate} is not a valid iri`);
+
+                prefix = matches[1];
+                predicate = matches[2];
+            }
+
             prefix = prefix.trim();
             if (!this._validCharacterRegex.test(predicate))
                 throw new Error(
