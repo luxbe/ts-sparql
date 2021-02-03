@@ -1,6 +1,6 @@
 import request from '../__mocks__/request';
 
-jest.mock('../connection/request', () => request);
+jest.mock('../client/request', () => request);
 import TsSparql from '..';
 
 import { User } from './user';
@@ -8,17 +8,11 @@ import { User } from './user';
 const tsSparql = TsSparql.init();
 
 test('tsSparql should connect to database', async (done) => {
-    TsSparql.connect(
-        {
-            repository: 'example',
-            host: 'localhost',
-            port: 7200,
-        },
-        (err) => {
-            if (err) return done(err);
-            done();
-        },
-    );
+    TsSparql.connect({
+        repository: 'example',
+        host: 'localhost',
+        port: 7200,
+    });
 });
 
 test('tsSparql should save User', async (done) => {
