@@ -7,6 +7,7 @@ export class SPARQLMapper {
 
     private s?: string;
     private g?: string;
+    private c?: { [key: string]: string } = {};
     private _idKey?: string;
     private _id?: string;
     private p?: Property[];
@@ -32,7 +33,7 @@ export class SPARQLMapper {
             const { prefix } = p.iri;
             if (prefix !== undefined && !Object.keys(this.n).includes(prefix))
                 this.n[prefix] = PrefixManager.get(prefix, name);
-            if (p.value !== undefined) {
+            if (p.value !== undefined && p.datatype !== undefined) {
                 p.value = this.dataMapper.mapToString(p.value, p.datatype);
             }
             return p;
@@ -42,6 +43,10 @@ export class SPARQLMapper {
 
     graph(graph: string) {
         this.g = graph;
+    }
+
+    conditions(conditions: { [key: string]: string }) {
+        this.c = conditions;
     }
 
     sparql(operation: 'INSERT' | 'SELECT'): string {
@@ -64,17 +69,23 @@ export class SPARQLMapper {
             .map(([prefix, namespace]) => `PREFIX ${prefix}: <${namespace}>`)
             .join(' ');
 
-        let vars = '';
         const op: string[] = [];
         const nop: string[] = [];
 
         const idStr = this._id ? this._id : `?${this._idKey}`;
 
+        const conditions = this.c || {};
+
         this.p!.forEach((p) => {
-            vars += `?${p.key} `;
             let props = nop;
             if (p.optional) props = op;
-            props.push(p.iri + ' ?' + p.key);
+            props.push(
+                p.iri.toSparql() +
+                    ' ' +
+                    (conditions[p.key] !== undefined
+                        ? `"${conditions[p.key]}"`
+                        : '?' + p.key),
+            );
         });
 
         const optionalStr = op.length
@@ -83,9 +94,7 @@ export class SPARQLMapper {
 
         const whereStr = `${idStr} ${nop.join('; ')}. ${optionalStr}`;
 
-        const selectStr = `SELECT ${
-            this._id ? '' : idStr
-        } ${vars}WHERE { ${whereStr} }`;
+        const selectStr = `SELECT * WHERE { ${whereStr} }`;
 
         return `${prefStr.length ? prefStr + ' ' : ''}${selectStr}`;
     }
