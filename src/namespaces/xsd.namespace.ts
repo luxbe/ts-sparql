@@ -20,4 +20,9 @@ export default class XSD {
      * XML Schema data type
      */
     static BOOLEAN = XSD.NAMESPACE + 'boolean';
+
+    /**
+     * XML Schema data type
+     */
+    static INTEGER = XSD.NAMESPACE + 'integer';
 }
