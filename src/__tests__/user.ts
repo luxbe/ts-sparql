@@ -1,11 +1,11 @@
 import { Entity, Property } from '..';
-import { Id } from '../decorators';
+import { Id, Prefix } from '../decorators';
 
 @Entity({
-    name: 'user',
-    namespaces: {
-        ex: 'http://example.com',
-    },
+    iri: 'http://example.com/user#',
+})
+@Prefix({
+    ex: 'http://example.com',
 })
 export class User {
     @Id()
