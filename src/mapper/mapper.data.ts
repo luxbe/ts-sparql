@@ -9,10 +9,14 @@ export class DataMapper {
 
     private _objectMappers: {
         [key: string]: (value: string) => any;
-    } = {};
+    } = {
+        [XSD.INTEGER]: (value: string) => Number(value),
+    };
+
     private _stringMappers: {
         [key: string]: (value: any) => string;
     } = {
+        Number: (value) => `"${value}"`,
         String: (value) => `"${value}"`,
         Date: (value) => `"${(value as Date).toISOString()}"^^<${XSD.DATE}>`,
         Boolean: (value) => `"${value as boolean}"^^<${XSD.BOOLEAN}>`,
