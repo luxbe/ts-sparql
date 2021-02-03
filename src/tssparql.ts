@@ -58,7 +58,7 @@ export class TsSparql {
     getById<T extends object>(
         entityType: Type<T> | string,
         id: string,
-    ): Promise<T> {
+    ): Promise<T | undefined> {
         return this.query(entityType, { id }).then((res) => {
             return res[0];
         });
@@ -71,7 +71,9 @@ export class TsSparql {
     query<T extends object>(
         entityType: Type<T> | string,
         options: {
-            conditions?: Condition[];
+            conditions?: {
+                [key: string]: string;
+            };
             id?: string;
         } = {},
     ): Promise<T[]> {
@@ -108,8 +110,12 @@ export class TsSparql {
 
         if (graph !== undefined) mapper.graph(`<${graph.toString()}>`);
         if (options.id !== undefined) mapper.id(type + options.id);
+        if (options.conditions !== undefined)
+            mapper.conditions(options.conditions);
 
         const sparql = mapper.sparql('SELECT');
+
+        console.log(sparql);
 
         const connection = TsSparql.client?.getConnection();
 
@@ -118,34 +124,51 @@ export class TsSparql {
 
             const res = [];
 
-            for (const b of _res.results.bindings) {
-                const entity = this.entityMapper.map(
-                    _entityType,
-                    b,
-                    options.id,
-                );
+            for (const binding of _res.results.bindings) {
+                const {
+                    entity,
+                    relatedEntityProperties,
+                } = this.entityMapper.map(_entityType, binding, options.id);
 
-                const entities: { key: string; value: string }[] = [];
-                Object.entries(b).forEach(([key, v]) => {
+                for await (const relatedEntityData of relatedEntityProperties) {
+                    relatedEntityData.datatype ||= relatedEntityData.entity;
                     if (
-                        v.type === 'uri' &&
-                        key !== idKey &&
-                        v.value !== type.toString() + entity[idKey]
-                    )
-                        entities.push({ key, value: v.value });
-                });
+                        relatedEntityData.datatype !== undefined &&
+                        this.metadata.storage.entities.includes(
+                            relatedEntityData.datatype,
+                        )
+                    ) {
+                        const id = relatedEntityData.value.substr(
+                            this.metadata.storage.types[
+                                relatedEntityData.datatype
+                            ].toString().length,
+                        );
 
-                for (const e of entities) {
-                    const _entType = entProperties[e.key];
+                        const relatedEntity = await this.getById(
+                            relatedEntityData.datatype,
+                            id,
+                        );
 
-                    const id = e.value.substr(
-                        this.metadata.storage.types[_entType].toString().length,
-                    );
-
-                    const en = await this.getById(_entType, id);
-
-                    (entity as any)[e.key] = en;
+                        if (relatedEntityData.isArray)
+                            (entity as any)[relatedEntityData.key].push(
+                                relatedEntity,
+                            );
+                        else
+                            (entity as any)[
+                                relatedEntityData.key
+                            ] = relatedEntity;
+                    }
                 }
+
+                // const entities: { key: string; value: string }[] = [];
+                // Object.entries(binding).forEach(([key, v]) => {
+                //     // if (
+                //     //     v.type === 'uri' &&
+                //     //     key !== idKey &&
+                //     //     v.value !== type.toString() + entity[idKey]
+                //     // )
+                //     //     entities.push({ key, value: v.value });
+                // });
 
                 res.push(entity);
             }
@@ -153,57 +176,44 @@ export class TsSparql {
         });
     }
 
-    save<T extends object>(entity: T): Promise<void> {
+    save<T extends object>(entity: T, limit: number = 1): Promise<void> {
         if (TsSparql.client === undefined)
             throw new Error('No client configured');
 
         const {
             name,
             idKey,
-            properties: _p,
+            properties: metadataProperties,
             type,
             graph,
         } = this.metadata.entityInstance(entity).getMetadata();
-
-        const entities: any[] = [];
 
         // get id
         const id = (entity as any)[idKey];
         const properties: Property[] = [];
 
-        _p.forEach((p) => {
+        // properties where other entites are referenced
+        const entityProperties: any[] = [];
+
+        for (const p of metadataProperties) {
             p.value = (entity as any)[p.key];
 
-            if (p.datatype === 'Array') {
-                const { iri, entity: propEntity, key, optional } = p;
-                const values = p.value as any[];
+            if (p.value === undefined) continue;
 
-                if (values === undefined) return false;
-                properties.push(
-                    ...values
-                        .map<Property>((value) => {
-                            return {
-                                datatype: value.constructor.name,
-                                iri,
-                                entity: propEntity,
-                                key,
-                                optional,
-                                value,
-                            };
-                        })
-                        .filter((_property) => _property.value !== undefined),
-                );
-            } else {
+            if (p.isArray) {
+                const values = p.value as any[];
+                if (values === undefined || values.length === 0) continue;
+
+                p.datatype = values[0].constructor.name;
+            }
+
+            if (p.value !== undefined) {
+                if (p.entity !== undefined && limit > 0) {
+                    entityProperties.push(p.value);
+                }
                 properties.push(p);
             }
-        });
-
-        properties.filter((p) => {
-            if (p.entity !== undefined && p.value !== undefined) {
-                entities.push(p.value);
-            }
-            return p.value !== undefined;
-        });
+        }
 
         const mapper = this.sparqlMapper
             .subject(`<${type.toString()}${id}>`)
@@ -212,9 +222,9 @@ export class TsSparql {
 
         const sparql = mapper.sparql('INSERT');
 
-        console.log(sparql);
+        // console.log(sparql);
 
-        entities.forEach((e) => this.save(e));
+        entityProperties.forEach((e) => this.save(e, limit - 1));
 
         const connection = TsSparql.client?.getConnection();
 
