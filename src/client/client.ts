@@ -1,7 +1,7 @@
 import { Connection } from './connection';
 
 export class Client {
-    MAX_CONNECTIONS = 3;
+    MAX_CONNECTIONS = 1000;
 
     private repository: string;
     private url: string;
