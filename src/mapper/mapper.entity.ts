@@ -1,5 +1,5 @@
 import { DataMapper } from './mapper.data';
-import { Binding, Type } from '../interfaces';
+import { Binding, Property, Type } from '../interfaces';
 import { Metadata } from '../metadata';
 
 export class EntityMapper {
@@ -17,8 +17,17 @@ export class EntityMapper {
         return EntityMapper._instance;
     }
 
-    map<T>(type: Type<T>, binding: Binding, id?: string): T {
+    map<T>(
+        type: Type<T>,
+        binding: Binding,
+        id?: string,
+    ): {
+        entity: T;
+        relatedEntityProperties: Property[];
+    } {
         const entity = Object.create(type.prototype);
+
+        const relatedEntityProperties: Property[] = [];
 
         const { idKey, properties, type: _t } = Metadata.global
             .entityType(type)
@@ -27,17 +36,35 @@ export class EntityMapper {
         entity[idKey] =
             id || binding[idKey]!.value.substr(_t.toString().length);
 
-        properties.forEach((p) => {
-            const b = binding[p.key];
+        for (const p of properties) {
+            const bindingProperty = binding[p.key];
 
-            if (b === undefined) return;
+            if (bindingProperty === undefined) continue;
 
-            entity[p.key] = this.dataMapper.mapFromString(
+            const value = this.dataMapper.mapFromString(
                 binding[p.key].value,
                 binding[p.key].datatype || 'String',
             );
-        });
 
-        return entity;
+            if (p.isArray) {
+                entity[p.key] = [];
+            }
+
+            if (p.entity !== undefined) {
+                p.value = value;
+                relatedEntityProperties.push(p);
+            } else {
+                if (p.datatype === 'Array') {
+                    entity[p.key].push(value);
+                } else {
+                    entity[p.key] = value;
+                }
+            }
+        }
+
+        return {
+            entity,
+            relatedEntityProperties,
+        };
     }
 }
